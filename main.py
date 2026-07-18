@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import engine
 import models
@@ -20,7 +20,7 @@ def get_db():
         db.close()
 
 
-#Login route to generate JWT token
+#Login API
 @app.post("/login")
 def login():
     return {
@@ -49,10 +49,24 @@ def create_blog(blog: schemas.BlogCreate, db: Session = Depends(get_db), user = 
 
 
 #Read all blogs (protected route)
-@app.get("/blogs/", response_model=list[schemas.BlogResponse])
-def get_blogs(db: Session = Depends(get_db), user = Depends(verify_token)):
-    blogs = db.query(models.Blog).all()
-    return blogs
+@app.get("/blogs/")
+def get_blogs(page: int = 1,
+              limit: int = 5,
+              search: str = Query(default=""),
+              db: Session = Depends(get_db), user = Depends(verify_token)):
+    query = db.query(models.Blog)
+    if search:
+        query = query.filter(models.Blog.title.ilike(f"%{search}%"))
+    total = query.count()
+    start = (page - 1) * limit
+    blogs = query.offset(start).limit(limit).all()
+    return {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "blogs": blogs
+    }
+
 
 #Read a single blog by ID (protected route)
 @app.get("/blogs/{blog_id}", response_model=schemas.BlogResponse)
