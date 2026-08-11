@@ -12,7 +12,6 @@ A simple, modular Blog API built with FastAPI. This repo provides user authentic
 - Pagination and basic filtering for list endpoints
 - Automatic API docs (Swagger UI and ReDoc)
 - Alembic migrations and SQLAlchemy/SQLModel examples
-- Optional Docker + docker-compose for local development
 
 ## Tech stack
 
@@ -23,7 +22,6 @@ A simple, modular Blog API built with FastAPI. This repo provides user authentic
 - Alembic (DB migrations)
 - Pydantic (validation)
 - PostgreSQL (recommended) or SQLite (dev)
-- Docker & Docker Compose (optional)
 
 ## Quick start (development)
 
@@ -70,69 +68,6 @@ SECRET_KEY=your-very-secret-jwt-key
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ALGORITHM=HS256
 ```
-
-## Recommended project structure
-
-This layout is recommended and maps to the API structure used in the docs and examples.
-
-```
-Blog-FastAPI/
-├── alembic/                   # Alembic migration files
-│   ├── versions/
-│   └── env.py
-├── app/
-│   ├── __init__.py
-│   ├── main.py                 # FastAPI app instance, include routers, events
-│   ├── core/
-│   │   ├── config.py           # settings (pydantic BaseSettings)
-│   │   └── security.py         # JWT helpers, password hashing
-│   ├── db/
-│   │   ├── base.py             # Base models / metadata
-│   │   └── session.py          # engine, SessionLocal / async engine
-│   ├── models/                 # ORM models (user, post, comment)
-│   │   ├── user.py
-│   │   ├── post.py
-│   │   └── comment.py
-│   ├── schemas/                # Pydantic schemas (requests/responses)
-│   │   ├── auth.py
-│   │   ├── user.py
-│   │   ├── post.py
-│   │   └── comment.py
-│   ├── crud/                   # DB helpers (encapsulate queries)
-│   │   ├── user.py
-│   │   └── post.py
-│   ├── api/                    # Routers and deps
-│   │   ├── __init__.py
-│   │   ├── deps.py             # dependency overrides (get_db, get_current_user)
-│   │   ├── auth.py             # /auth routes (login, register)
-│   │   ├── users.py            # /users
-│   │   ├── posts.py            # /posts
-│   │   └── comments.py         # /posts/{id}/comments
-│   ├── tests/                  # pytest tests
-│   │   ├── conftest.py
-│   │   └── test_posts.py
-│   └── utils/                  # helpers (pagination, email, etc.)
-│       └── pagination.py
-├── requirements.txt
-├── pyproject.toml / setup.cfg  # optional
-├── README.md
-├── .env.example
-├── .gitignore
-├── Dockerfile
-└── docker-compose.yml
-```
-
-Key files explained:
-- app/main.py: Create FastAPI app, include routers, middleware, startup/shutdown events.
-- app/core/config.py: Use pydantic BaseSettings for env vars.
-- app/core/security.py: JWT creation/verification and password hashing (passlib/bcrypt).
-- app/db/session.py: Database engine and session dependency for routes.
-- app/models/*: SQLAlchemy or SQLModel models (User, Post, Comment).
-- app/schemas/*: Pydantic models for request validation and response serialization.
-- app/crud/*: Encapsulated DB operations so routes stay thin.
-- app/api/*: Routers grouped by resource (auth, posts, comments).
-- alembic/: Migration scripts generated with alembic revision --autogenerate.
-
 ## API overview (example endpoints)
 
 Authentication
@@ -190,15 +125,6 @@ pytest -q
 ```
 Add fixtures in app/tests/conftest.py to provide a test client and test DB sessions.
 
-## Docker (optional)
-
-Dockerfile + docker-compose.yml can help run the app and Postgres locally.
-
-Example:
-```bash
-docker-compose up --build
-```
-
 ## Linting & formatting
 
 - black: `black .`
@@ -216,15 +142,3 @@ Contributions are welcome:
 ## Author
 
 Arslan Ahmad
-
-## License
-
-Add a LICENSE file (e.g., MIT) and specify it here.
-
-## Next steps / customization notes
-
-- If you use async DB drivers (asyncpg / aiosqlite), adapt session and engine code accordingly.
-- Add request/response examples in docs or an OpenAPI extension for client reference.
-- Add CI (GitHub Actions) for linting, tests, and build checks.
-
-If you want, I can tailor this README to exactly match the files currently present in your repository (scan repo and update paths, commands, or add missing examples).
